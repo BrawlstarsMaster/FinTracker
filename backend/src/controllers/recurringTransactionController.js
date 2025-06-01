@@ -32,6 +32,5 @@ exports.remove = async (req, res) => {
 };
 
 exports.triggerDue = async (req, res) => {
-  // TODO: Implement logic to find and create transactions for due recurring transactions
   res.status(200).json({ message: 'Trigger Due Recurring Transactions endpoint - To be implemented' });
 }; 

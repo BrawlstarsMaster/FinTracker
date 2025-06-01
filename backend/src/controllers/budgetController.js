@@ -45,7 +45,6 @@ exports.remove = async (req, res) => {
   res.json({ message: 'Deleted' });
 };
 
-// Get usage for a budget (total spent in category/month/year)
 exports.getUsage = async (req, res) => {
   const { categoryId, month, year } = req.query;
   const where = {

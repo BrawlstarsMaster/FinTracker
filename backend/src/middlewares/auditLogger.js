@@ -5,7 +5,6 @@ module.exports = (entity) => async (req, res, next) => {
   const entityId = req.params.id;
   const action = req.method;
   const changes = req.body;
-  // Логваме само при POST, PUT, DELETE
   if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method) && userId) {
     await AuditLog.create({
       userId,

@@ -20,10 +20,9 @@ exports.remove = async (req, res) => {
   res.json({ message: 'Deleted' });
 };
 
-// Fetch finance news and create notifications for all users
 exports.fetchFinanceNews = async (req, res) => {
   try {
-    // Example: Use a free news API (replace with your API key if needed)
+    
     const newsRes = await axios.get('https://financialmodelingprep.com/api/v3/stock_news?limit=5&apikey=GhcWkPGbSQ53Lt3IViMl8vQZ3t34Hbog');
     const news = newsRes.data;
     const users = await User.findAll();

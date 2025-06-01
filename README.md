@@ -1,49 +1,415 @@
-# FinTrack
+Разбира се! Ще ти подготвя изключително подробна документация за проекта, подходяща за 10-15 страници (ако се оформи като Word/PDF документ). Ще включа архитектура, използвани технологии, структура на кода, описание на основните и допълнителни функционалности, примери за API, миграции, cron jobs, причини за избора на технологии, инструкции за стартиране и развитие, и още.
 
-FinTrack is a finance tracking web application that helps users manage personal income, expenses, savings goals, and investments. It is built with React, Node.js, Express, and PostgreSQL, and is fully containerized with Docker.
+---
 
-## Features
-- User registration and secure login
-- Add, edit, and categorize income and expenses
-- Set savings goals and track progress
-- Visualize monthly financial status via graphs
-- Admin dashboard for user management and reports
+# Документация на проекта: **Finance Management App**
 
-## Tech Stack
-- Frontend: React + TailwindCSS
-- Backend: Node.js + Express.js
-- Database: PostgreSQL (via Sequelize ORM)
-- DevOps: Docker, GitHub Actions
-- API Docs: Swagger
+---
 
-## Getting Started
+## Съдържание
 
-### Prerequisites
-- Docker & Docker Compose
-- Node.js (if running locally)
+1. **Въведение**
+2. **Технологии и инструменти**
+3. **Архитектура на проекта**
+4. **Структура на кода**
+5. **Описание на основните функционалности**
+6. **Допълнителни функционалности**
+7. **Backend: Подробно описание**
+8. **Frontend: Подробно описание**
+9. **База данни и миграции**
+10. **Cron jobs и външни интеграции**
+11. **API документация**
+12. **Инструкции за инсталация и стартиране**
+13. **Причини за избора на технологии**
+14. **Възможности за разширяване**
+15. **Заключение**
 
-### Quick Start (Docker Compose)
+---
+
+## 1. Въведение
+
+**Finance Management App** е пълнофункционално уеб приложение за управление на лични финанси. Позволява на потребителите да следят приходите и разходите си, да създават бюджети, да управляват категории, да получават известия и да визуализират статистики. Приложението е изградено с модерен стек от технологии и е проектирано за лесно разширяване и поддръжка.
+
+---
+
+## 2. Технологии и инструменти
+
+### Frontend
+
+- **React** – библиотека за изграждане на потребителски интерфейси.
+- **Tailwind CSS** – utility-first CSS framework за бърз и модерен дизайн.
+- **React Router** – за клиентска навигация между страниците.
+- **Axios** – за HTTP заявки към backend-а.
+- **Chart.js / Recharts** – за визуализация на статистики и графики.
+
+### Backend
+
+- **Node.js** – JavaScript runtime за сървърната част.
+- **Express.js** – уеб framework за изграждане на REST API.
+- **Sequelize** – ORM за работа с релационни бази данни.
+- **jsonwebtoken** – за генериране и валидиране на JWT токени.
+- **bcrypt** – за хеширане на пароли.
+- **node-cron** – за периодично изпълнение на задачи (cron jobs).
+- **dotenv** – за управление на конфигурационни променливи.
+
+### База данни
+
+- **PostgreSQL** – релационна база данни с висока производителност и надеждност.
+
+### Инструменти за разработка
+
+- **VSCode** – редактор на код.
+- **Postman** – за тестване на API.
+- **Git** – контрол на версиите.
+- **npm/yarn** – управление на зависимости.
+
+---
+
+## 3. Архитектура на проекта
+
+### Общ преглед
+
+- **Frontend** и **Backend** са разделени в отделни директории.
+- **REST API** комуникация между frontend и backend.
+- **JWT** базирана автентикация.
+- **ORM** слой за абстракция на базата данни.
+- **Cron jobs** за автоматизирани задачи (напр. известия с новини).
+
+### Диаграма
+
+```
+[User Browser]
+      |
+      v
+[React Frontend] <----> [Express Backend] <----> [PostgreSQL DB]
+      |                        ^
+      |                        |
+      |----> [Външен API за новини] (чрез cron job)
+```
+
+---
+
+## 4. Структура на кода
+
+### Основни директории
+
+```
+rs/
+  backend/
+    src/
+      controllers/
+      cron/
+      middlewares/
+      models/
+      routes/
+  frontend/
+    public/
+    src/
+      components/
+      contexts/
+      pages/
+```
+
+#### Backend
+
+- **controllers/** – бизнес логика за всеки ресурс (users, transactions, budgets и т.н.)
+- **cron/** – задачи, които се изпълняват периодично (напр. fetch на новини).
+- **middlewares/** – междинен софтуер (автентикация, обработка на грешки).
+- **models/** – Sequelize модели за всички таблици.
+- **routes/** – дефиниция на API endpoint-и.
+
+#### Frontend
+
+- **components/** – преизползваеми UI компоненти (напр. Modal, Navbar).
+- **contexts/** – React Contexts за глобално състояние (напр. UserContext).
+- **pages/** – отделни страници (Dashboard, Transactions, Budgets и т.н.).
+
+---
+
+## 5. Описание на основните функционалности
+
+### 5.1. Регистрация и логин
+
+- **Регистрация:**  
+  - Потребителят въвежда имейл и парола.
+  - Данните се изпращат към `/api/register`.
+  - Паролата се хешира с bcrypt.
+  - При успех се създава нов потребител и се връща JWT токен.
+
+- **Логин:**  
+  - Потребителят въвежда имейл и парола.
+  - Данните се изпращат към `/api/login`.
+  - При успех се връща JWT токен, който се съхранява в localStorage.
+
+- **Защита на маршрути:**  
+  - Всички чувствителни API endpoint-и изискват валиден JWT токен.
+  - Frontend проверява дали потребителят е логнат и пренасочва при нужда.
+
+### 5.2. Управление на транзакции
+
+- **CRUD операции:**  
+  - Добавяне, редакция, изтриване на транзакции.
+  - Всяка транзакция има: сума, категория, дата, описание, тип (приход/разход).
+  - Връзка с категория чрез foreign key (`categoryId`).
+
+- **Филтриране и търсене:**  
+  - По дата, категория, тип.
+
+### 5.3. Бюджети
+
+- **Създаване на бюджети по категории.**
+- **Преглед на използване на бюджета (endpoint `/api/budgets/usage`).**
+- **Редакция и изтриване на бюджети.**
+- **Визуализация на прогреса (progress bar).**
+
+### 5.4. Категории
+
+- **CRUD за категории.**
+- **Използване на dropdown менюта за избор на категория при транзакции и бюджети.**
+
+### 5.5. Повтарящи се транзакции
+
+- **Добавяне на повтарящи се транзакции с описание, сума, категория и период.**
+- **Редакция и изтриване.**
+- **Автоматично създаване на транзакции според зададения период.**
+
+### 5.6. Известия и новини
+
+- **Cron job fetch-ва новини от външен API на всеки час и половин час.**
+- **Създава известия за всички потребители.**
+- **Потребителят може да маркира известия като прочетени.**
+
+### 5.7. Статистики
+
+- **Графики за разходи по категории (pie chart).**
+- **Графики за приходи/разходи по месеци (bar chart).**
+
+---
+
+## 6. Допълнителни функционалности
+
+- **Модални прозорци за по-добро UX при добавяне/редакция.**
+- **Автоматично обновяване на данните след всяка операция.**
+- **Обработка на грешки и показване на съобщения за успех/неуспех.**
+- **Възможност за разширяване с dark mode, експорт на данни, мултиезичност и др.**
+
+---
+
+## 7. Backend: Подробно описание
+
+### 7.1. Controllers
+
+- **UserController:**  
+  - Регистрация, логин, профил.
+- **TransactionController:**  
+  - CRUD за транзакции, филтриране.
+- **BudgetController:**  
+  - CRUD за бюджети, изчисляване на използване.
+- **CategoryController:**  
+  - CRUD за категории.
+- **NotificationController:**  
+  - CRUD за известия, fetch на новини.
+
+### 7.2. Middlewares
+
+- **authMiddleware:**  
+  - Проверява валидността на JWT токена.
+- **errorHandler:**  
+  - Централизирана обработка на грешки.
+
+### 7.3. Модели
+
+- **User:**  
+  - id, email, passwordHash, createdAt, updatedAt
+- **Transaction:**  
+  - id, amount, type, description, date, categoryId, userId
+- **Budget:**  
+  - id, amount, categoryId, userId, period
+- **Category:**  
+  - id, name, userId (или глобални)
+- **Notification:**  
+  - id, title, content, userId, read, createdAt
+- **RecurringTransaction:**  
+  - id, amount, type, description, categoryId, userId, period, nextRun
+
+### 7.4. Routes
+
+- `/api/register`, `/api/login`
+- `/api/transactions`
+- `/api/budgets`
+- `/api/categories`
+- `/api/notifications`
+- `/api/recurring`
+
+---
+
+## 8. Frontend: Подробно описание
+
+### 8.1. Основни компоненти
+
+- **Navbar:**  
+  - Линкове към всички основни страници, показва името на потребителя.
+- **Modal:**  
+  - Универсален компонент за добавяне/редакция.
+- **Forms:**  
+  - За регистрация, логин, транзакции, бюджети, категории.
+
+### 8.2. Страници
+
+- **Dashboard:**  
+  - Обобщена информация, бързи действия.
+- **TransactionsPage:**  
+  - Списък, филтри, модали за CRUD.
+- **BudgetsPage:**  
+  - Списък, прогрес, модали за CRUD.
+- **CategoriesPage:**  
+  - Списък, модали за CRUD.
+- **RecurringPage:**  
+  - Списък, модали за CRUD.
+- **NotificationsPage:**  
+  - Списък с известия, маркиране като прочетени.
+- **StatsPage:**  
+  - Графики и анализи.
+
+### 8.3. Contexts
+
+- **UserContext:**  
+  - Съхранява информация за логнатия потребител.
+- **NotificationContext:**  
+  - Съхранява и обновява известията.
+
+---
+
+## 9. База данни и миграции
+
+- **Sequelize миграции** за създаване и промяна на таблици.
+- **Миграционен скрипт** за попълване на `categoryId` в съществуващи транзакции и бюджети.
+- **Връзки между таблиците:**  
+  - User 1:N Transaction  
+  - User 1:N Budget  
+  - User 1:N Category  
+  - Category 1:N Transaction  
+  - Category 1:N Budget
+
+---
+
+## 10. Cron jobs и външни интеграции
+
+- **node-cron** стартира задачи на всеки час и половин час.
+- **Външен API** за финансови новини (напр. NewsAPI, Finnhub).
+- **Създаване на известия** за всички потребители при нови новини.
+
+---
+
+## 11. API документация (примерни заявки)
+
+### Регистрация
+
+```http
+POST /api/register
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+### Логин
+
+```http
+POST /api/login
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+### Добавяне на транзакция
+
+```http
+POST /api/transactions
+Authorization: Bearer <token>
+{
+  "amount": 100,
+  "type": "expense",
+  "description": "Groceries",
+  "date": "2024-06-01",
+  "categoryId": 2
+}
+```
+
+### Получаване на бюджети
+
+```http
+GET /api/budgets
+Authorization: Bearer <token>
+```
+
+### Получаване на известия
+
+```http
+GET /api/notifications
+Authorization: Bearer <token>
+```
+
+---
+
+## 12. Инструкции за инсталация и стартиране
+
+### 12.1. Клониране на репото
+
 ```bash
 git clone <repo-url>
 cd rs
-docker-compose up --build
 ```
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5000
-- Swagger Docs: http://localhost:5000/api-docs
+### 12.2. Настройка на backend
 
-### Environment Variables
-Copy `.env.example` to `.env` in both `/backend` and `/frontend` and fill in the required values.
+```bash
+cd backend
+cp .env.example .env
+# Попълнете данните за базата данни
+npm install
+npx sequelize db:migrate
+npm start
+```
 
-## Documentation
-- [API Docs (Swagger)](backend/swagger.yaml)
-- [Admin Guide](docs/admin_guide.md)
-- [User Guide](docs/user_guide.md)
+### 12.3. Настройка на frontend
 
-## Testing
-- Backend: `npm test` in `/backend`
-- Frontend: `npm test` in `/frontend`
+```bash
+cd ../frontend
+npm install
+npm start
+```
 
-## License
-MIT 
+### 12.4. Създаване на потребител
+
+- Регистрирайте се през интерфейса или чрез Postman.
+
+---
+
+## 13. Причини за избора на технологии
+
+- **React** – бързина, компонентен подход, голяма общност.
+- **Tailwind CSS** – бърз и лесен за използване, модерен дизайн.
+- **Node.js + Express** – лесна интеграция с JavaScript frontend, бързо прототипиране.
+- **Sequelize** – абстракция на базата, лесни миграции.
+- **PostgreSQL** – стабилна, мащабируема, поддържа сложни заявки.
+- **JWT** – сигурна и мащабируема автентикация.
+- **node-cron** – лесно управление на периодични задачи.
+
+---
+
+## 14. Възможности за разширяване
+
+- **Dark mode** – лесно с Tailwind.
+- **Експорт/импорт на данни** – CSV, PDF.
+- **Мултиезичност** – i18n библиотеки.
+- **Мобилно приложение** – чрез React Native.
+- **Интеграция с банки** – чрез Open Banking API.
+- **Уведомления по email/SMS** – чрез външни услуги.
+
+---
+
+## 15. Заключение
+
+Проектът предоставя стабилна основа за управление на лични финанси с модерен интерфейс, сигурна автентикация, богата функционалност и възможност за лесно разширяване. Използваните технологии са избрани с мисъл за бъдещо развитие, поддръжка и мащабируемост.

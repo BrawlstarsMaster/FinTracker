@@ -2,7 +2,6 @@ const { Transaction, Budget, Category } = require('../models');
 const { Op } = require('sequelize');
 
 async function migrateCategoryIds() {
-  // Transactions
   const transactions = await Transaction.findAll();
   for (const t of transactions) {
     if (!t.categoryId && t.category) {
@@ -21,7 +20,7 @@ async function migrateCategoryIds() {
       }
     }
   }
-  // Budgets
+
   const budgets = await Budget.findAll();
   for (const b of budgets) {
     if (!b.categoryId && b.category) {

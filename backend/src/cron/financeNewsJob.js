@@ -24,7 +24,6 @@ async function fetchFinanceNewsJob() {
   }
 }
 
-// Run at every hour and half hour (xx:00, xx:30)
 cron.schedule('0,30 * * * *', fetchFinanceNewsJob);
 
 module.exports = fetchFinanceNewsJob; 

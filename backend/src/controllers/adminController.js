@@ -5,9 +5,8 @@ exports.listUsers = async (req, res) => {
   res.json(users);
 };
 
-// Placeholder for generating reports
 exports.generateReports = async (req, res) => {
-  // TODO: Implement report generation logic
+
   res.status(200).json({ message: 'Report generation endpoint - To be implemented' });
 };
 
@@ -25,7 +24,6 @@ exports.reactivateUser = async (req, res) => {
   res.json({ message: 'User reactivated' });
 };
 
-// Category management
 exports.listCategories = async (req, res) => {
   const categories = await Category.findAll({ where: { userId: null } });
   res.json(categories);
