@@ -51,8 +51,23 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh 'docker-compose down'
-                sh 'docker-compose up -d'
+                sh '''
+                    if ! command -v docker &> /dev/null; then
+                        echo "Docker is not installed. Please install Docker first."
+                        exit 1
+                    fi
+                    
+                    if ! command -v docker-compose &> /dev/null; then
+                        echo "Docker Compose is not installed. Please install Docker Compose first."
+                        exit 1
+                    fi
+                    
+                    echo "Stopping existing containers..."
+                    docker-compose down || true
+                    
+                    echo "Starting containers..."
+                    docker-compose up -d
+                '''
             }
         }
     }
