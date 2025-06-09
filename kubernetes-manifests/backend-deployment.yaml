@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: SvetoslavVachkov/backend:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: PORT
+          value: "5000"
+        # Add other environment variables if needed
+        # - name: DB_HOST
+        #   value: "your-db-host"

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext, useCallback } from 'react';
-import axios from 'axios';
+import { client, batchRequest } from '../api/client';
 import { AuthContext } from '../contexts/AuthContext';
 import { Bar } from 'react-chartjs-2';
 import {
@@ -26,15 +26,24 @@ const DashboardPage = () => {
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await axios.get('/api/transactions');
-      setTransactions(res.data);
-      const bal = res.data.reduce((acc, t) => t.type === 'income' ? acc + parseFloat(t.amount) : acc - parseFloat(t.amount), 0);
+      // Batch the API calls
+      const [transactionsRes, categoriesRes] = await Promise.all([
+        batchRequest('transactions', () => client.get('/transactions')),
+        batchRequest('categories', () => client.get('/categories'))
+      ]);
+
+      setTransactions(transactionsRes.data);
+      setCategories(categoriesRes.data);
+
+      const bal = transactionsRes.data.reduce((acc, t) => 
+        t.type === 'income' ? acc + parseFloat(t.amount) : acc - parseFloat(t.amount), 0);
       setBalance(bal);
+
       // Prepare chart data
       const months = Array.from({ length: 12 }, (_, i) => i + 1);
       const income = Array(12).fill(0);
       const expense = Array(12).fill(0);
-      res.data.forEach(t => {
+      transactionsRes.data.forEach(t => {
         const m = new Date(t.date).getMonth();
         if (t.type === 'income') income[m] += parseFloat(t.amount);
         else expense[m] += parseFloat(t.amount);
@@ -55,16 +64,13 @@ const DashboardPage = () => {
     fetchData();
   }, [fetchData]);
 
-  useEffect(() => {
-    axios.get('/api/categories').then(res => setCategories(res.data));
-  }, []);
-
   const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  
   const handleAdd = async (e) => {
     e.preventDefault();
     setError(''); setSuccess('');
     try {
-      await axios.post('/api/transactions', form);
+      await client.post('/transactions', form);
       setForm({ type: 'expense', categoryId: '', amount: '', date: '', description: '' });
       setSuccess('Транзакцията е добавена!');
       setError('');

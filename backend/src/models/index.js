@@ -26,6 +26,16 @@ const sequelize = new Sequelize(
     port: Number(process.env.DB_PORT),
     dialect: 'postgres',
     logging: false,
+    pool: {
+      max: 10,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    },
+    dialectOptions: {
+      statement_timeout: 10000,
+      idle_in_transaction_session_timeout: 10000
+    }
   }
 );
 
