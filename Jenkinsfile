@@ -12,6 +12,7 @@ pipeline {
             steps {
                 dir('backend') {
                     sh 'npm install'
+                    sh 'chmod -R 755 node_modules/.bin'
                 }
                 dir('frontend') {
                     sh 'npm install'
@@ -34,10 +35,16 @@ pipeline {
         stage('Test') {
             steps {
                 dir('backend') {
-                    sh 'npm test'
+                    sh '''
+                        export PATH=$PATH:$(pwd)/node_modules/.bin
+                        ./node_modules/.bin/jest
+                    '''
                 }
                 dir('frontend') {
-                    sh 'npm test'
+                    sh '''
+                        export PATH=$PATH:$(pwd)/node_modules/.bin
+                        ./node_modules/.bin/react-scripts test --watchAll=false
+                    '''
                 }
             }
         }
