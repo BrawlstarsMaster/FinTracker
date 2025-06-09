@@ -22,7 +22,7 @@ pipeline {
         stage('Build') {
             steps {
                 dir('frontend') {
-                    sh 'npm run build'
+                    sh 'npx react-scripts build'
                 }
             }
         }
