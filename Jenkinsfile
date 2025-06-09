@@ -15,6 +15,7 @@ pipeline {
                 }
                 dir('frontend') {
                     sh 'npm install'
+                    sh 'chmod -R 755 node_modules/.bin'
                 }
             }
         }
@@ -22,7 +23,10 @@ pipeline {
         stage('Build') {
             steps {
                 dir('frontend') {
-                    sh 'npx react-scripts build'
+                    sh '''
+                        export PATH=$PATH:$(pwd)/node_modules/.bin
+                        ./node_modules/.bin/react-scripts build
+                    '''
                 }
             }
         }
