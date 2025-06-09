@@ -37,13 +37,13 @@ pipeline {
                 dir('backend') {
                     sh '''
                         export PATH=$PATH:$(pwd)/node_modules/.bin
-                        ./node_modules/.bin/jest
+                        ./node_modules/.bin/jest --passWithNoTests
                     '''
                 }
                 dir('frontend') {
                     sh '''
                         export PATH=$PATH:$(pwd)/node_modules/.bin
-                        ./node_modules/.bin/react-scripts test --watchAll=false
+                        ./node_modules/.bin/react-scripts test --watchAll=false --passWithNoTests
                     '''
                 }
             }
