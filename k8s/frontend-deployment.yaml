@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fintrack-frontend
+  labels:
+    app: fintrack-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fintrack-frontend
+  template:
+    metadata:
+      labels:
+        app: fintrack-frontend
+    spec:
+      containers:
+      - name: fintrack-frontend
+        image: fintrack-frontend:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        env:
+        - name: REACT_APP_API_URL
+          value: "http://fintrack-backend:3000"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m" 
